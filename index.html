@@ -3,155 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qidiruv Tizimi</title>
+    <title>Global Search System v3.0</title>
     <style>
-        /* Umumiy dizayn */
+        /* ASOSIY STIL */
         body {
-            background-color: #050505; /* Qop-qora fon */
+            background-color: #0d0d0d;
+            color: #00ff00;
+            font-family: 'Consolas', monospace;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
-            font-family: 'Courier New', Courier, monospace; /* Hacker stili */
-            flex-direction: column;
-            overflow: hidden; /* Skrollni yo'qotish */
+            overflow: hidden;
         }
 
-        /* Yozuv stili */
-        h2 {
-            color: #fff;
-            text-shadow: 0 0 10px #00ffcc;
-            margin-bottom: 40px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-align: center;
-            font-size: 18px;
-        }
-
-        /* Batareya qutisi */
+        /* BATAREYA VA LOGLAR STILI (O'sha-o'sha) */
+        h2 { text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px #00ff00; text-align: center; }
+        
         .battery-container {
-            width: 280px;
-            height: 90px;
-            border: 3px solid #00ffcc; /* Neon ramka */
-            border-radius: 12px;
-            padding: 4px;
-            position: relative;
-            box-shadow: 0 0 20px #00ffcc, inset 0 0 10px #00ffcc; /* Neon yog'du */
+            width: 300px;
+            height: 50px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            padding: 3px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
         }
 
-        /* Batareya "kallasi" */
-        .battery-container::after {
-            content: '';
-            width: 15px;
-            height: 40px;
-            background: #00ffcc;
-            position: absolute;
-            right: -22px;
-            top: 25px;
-            border-top-right-radius: 6px;
-            border-bottom-right-radius: 6px;
-            box-shadow: 0 0 10px #00ffcc;
-        }
-
-        /* Zaryad (Ichidagi yashil suyuqlik) */
         .charge {
             height: 100%;
-            width: 0%; /* Boshlanishda 0% */
-            background: linear-gradient(90deg, #00ffcc, #00ff00); 
-            border-radius: 8px;
-            box-shadow: 0 0 15px #00ff00;
-            /* Transition JS orqali boshqariladi */
-            transition-timing-function: linear; 
+            width: 0%;
+            background: linear-gradient(90deg, #00cc00, #00ff00);
+            box-shadow: 0 0 20px #00ff00;
+            transition-timing-function: linear;
         }
 
-        /* Foiz ko'rsatkichi */
-        .percent {
-            color: #00ff00;
-            margin-top: 25px;
-            font-size: 28px;
+        .log-window {
+            width: 320px;
+            height: 120px;
+            background-color: #111;
+            border: 1px solid #00ff00;
+            padding: 10px;
+            font-size: 0.75rem;
+            overflow: hidden;
+            text-align: left;
+            opacity: 0.9;
+        }
+
+        .log-entry { margin-bottom: 4px; border-bottom: 1px solid #222; }
+        .china { color: #00ffff; }
+        .success { color: #00ff00; font-weight: bold; }
+        .error { color: #ff3333; }
+
+        /* YANGI: YUKLASH TUGMASI (Boshida ko'rinmaydi) */
+        #downloadBtn {
+            display: none; /* Yashirin */
+            margin-top: 30px;
+            padding: 15px 40px;
+            background-color: #00ff00;
+            color: #000;
             font-weight: bold;
-            text-shadow: 0 0 10px #00ff00;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 20px #00ff00;
+            text-transform: uppercase;
+            animation: pulse 1s infinite;
         }
 
-        /* Kichik yozuv pastda */
-        .loading-text {
-            margin-top: 10px;
-            color: #555;
-            font-size: 12px;
-            animation: blink 1.5s infinite;
-        }
-
-        @keyframes blink {
-            0% { opacity: 0.2; }
-            50% { opacity: 1; }
-            100% { opacity: 0.2; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-    <h2 id="statusText">MA'LUMOTLAR BAZASI <br> QIDIRILMOQDA...</h2>
+    <h2 id="mainTitle">SYSTEM SEARCHING...</h2>
 
-    <div class="battery-container">
+    <div class="battery-container" id="batteryBox">
         <div class="charge" id="batteryCharge"></div>
     </div>
+    <div id="percentText" style="margin-bottom: 20px; font-size: 1.2rem;">0%</div>
 
-    <div class="percent" id="percentText">0%</div>
-    <div class="loading-text">Serverga ulanish...</div>
+    <div class="log-window" id="logWindow">
+        <div class="log-entry">> Initializing search protocol...</div>
+    </div>
+
+    <button id="downloadBtn" onclick="downloadFile()">📥 DOWNLOAD MANUAL</button>
 
     <script>
         // ==========================================
-        // SOZLAMALAR (SHU YERNI O'ZGARTIRISHINGIZ MUMKIN)
+        // SOZLAMALAR (SHU YERNI TO'LDIRING)
         // ==========================================
         
-        // 1. Necha sekund "Loading" bo'lsin? (Reklama vaqtiga moslang)
-        const waitSeconds = 15; 
-
-        // 2. Sizning linklaringiz (Ikkalasi navbatma-navbat ishlaydi)
-        const link1 = "https://otieu.com/4/10546274";
-        const link2 = "https://otieu.com/4/10546272";
+        // 1. REKLAMA LINKLARINGIZ (Monetag)
+        const adLink1 = "https://otieu.com/4/10546274";
+        const adLink2 = "https://otieu.com/4/10546272";
+        
+        // 2. HAQIQIY FAYL LINKI (O'zingiz topib shu yerga qo'yasiz)
+        // Masalan: Telegram postingiz linki yoki Google Drive linki
+        const realFileLink = "https://t.me/SizningKanalingiz/123"; 
 
         // ==========================================
-        // KOD QISMI (TEGINMANG)
-        // ==========================================
-
+        
+        const waitSeconds = 12; // 12 sekund kutadi
         const charge = document.getElementById('batteryCharge');
         const percentText = document.getElementById('percentText');
-        const statusText = document.getElementById('statusText');
+        const logWindow = document.getElementById('logWindow');
+        const mainTitle = document.getElementById('mainTitle');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const batteryBox = document.getElementById('batteryBox');
 
-        // Qaysi linkka otishni tanlash (50/50 ehtimollik)
-        const targetLink = Math.random() < 0.5 ? link1 : link2;
+        // Reklamani tanlash
+        const finalAdLink = Math.random() < 0.5 ? adLink1 : adLink2;
+
+        const logs = [
+            { t: 1000, msg: "Connecting to global database...", type: "normal" },
+            { t: 3000, msg: "Error: File not found in Uzbekistan.", type: "error" },
+            { t: 4500, msg: "Rerouting to Shenzen (China) Server...", type: "china" },
+            { t: 6000, msg: "Bypassing firewall security...", type: "china" },
+            { t: 8000, msg: "Scanning industrial archives...", type: "china" },
+            { t: 10000, msg: "SUCCESS: Manual found!", type: "success" },
+            { t: 11000, msg: "Preparing download link...", type: "success" }
+        ];
+
+        function addLog(text, type) {
+            const div = document.createElement('div');
+            div.className = 'log-entry ' + type;
+            div.innerText = "> " + text;
+            logWindow.appendChild(div);
+            logWindow.scrollTop = logWindow.scrollHeight;
+        }
 
         window.onload = function() {
-            // CSS ga vaqtni o'rnatamiz
             charge.style.transitionDuration = waitSeconds + 's';
+            setTimeout(() => { charge.style.width = '100%'; }, 100);
 
-            // Ozgina kutib animatsiyani boshlaymiz
-            setTimeout(() => {
-                charge.style.width = '100%';
-            }, 100);
-
-            // Foizlarni sanash
             let counter = 0;
             let interval = setInterval(() => {
                 counter++;
                 percentText.innerText = counter + '%';
-                
-                if (counter === 100) {
-                    clearInterval(interval);
-                    statusText.innerHTML = "BAZA TOPILDI!<br>YUKLANMOQDA...";
-                    statusText.style.color = "#00ff00";
-                    percentText.style.color = "#fff";
-                }
+                if (counter >= 100) clearInterval(interval);
             }, (waitSeconds * 1000) / 100);
 
-            // Vaqt tugagach linkka otish
+            logs.forEach(item => {
+                setTimeout(() => { addLog(item.msg, item.type); }, item.t);
+            });
+
+            // Vaqt tugagach:
             setTimeout(() => {
-                window.location.href = targetLink;
+                mainTitle.innerText = "FAYL TAYYOR!";
+                mainTitle.style.color = "#00ff00";
+                batteryBox.style.display = "none"; // Batareyani yo'qotamiz
+                percentText.style.display = "none";
+                logWindow.style.display = "none";
+                
+                // TUGMANI CHIQARAMIZ
+                downloadBtn.style.display = "block";
             }, waitSeconds * 1000);
         };
-    </script>
 
+        // TUGMA BOSILGANDA NIMA BO'LADI?
+        function downloadFile() {
+            // 1. Yangi oynada REKLAMA ochiladi
+            window.open(finalAdLink, '_blank');
+            
+            // 2. Hozirgi oynada HAQIQIY FAYL ochiladi
+            window.location.href = realFileLink;
+        }
+    </script>
 </body>
 </html>
