@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gelectronics Driver</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #333; margin-bottom: 20px; }
+        input { width: 90%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; outline: none; }
+        input:focus { border-color: #0088cc; }
+        button { margin-top: 15px; padding: 15px 30px; background-color: #0088cc; color: white; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; width: 100%; }
+        button:active { transform: scale(0.98); }
+        .loader { display: none; margin-top: 20px; color: #666; font-size: 14px; }
+        .results { margin-top: 30px; text-align: left; }
+        .item { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #28a745; }
+        .item a { text-decoration: none; color: #333; font-weight: bold; font-size: 18px; display: block; }
+        .tag { display: inline-block; background: #e2e6ea; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: #555; margin-top: 5px; }
+        .desc { font-size: 13px; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>⚙️ Gelectronics Master Driver</h2>
+    <p style="color: #777; font-size: 12px;">Istalgan modelni yozing (IGBT, PLC, Inverter)</p>
+    
+    <input type="text" id="searchBox" placeholder="Masalan: FGA25N120 yoki Delta VFD-EL">
+    <button onclick="searchDocs()">🔍 QIDIRISH</button>
+
+    <div class="loader" id="loader">
+        <p>🔄 Global baza tahlil qilinmoqda...</p>
+        <p style="font-size: 11px; color: #999;">(Homiylar serveri ulanmoqda, 5 soniya kuting)</p>
+    </div>
+
+    <div class="results" id="resultsArea"></div>
+</div>
+
+<script>
+    async function searchDocs() {
+        let query = document.getElementById("searchBox").value;
+        if (!query) return alert("Iltimos, model nomini yozing!");
+
+        document.getElementById("loader").style.display = "block";
+        document.getElementById("resultsArea").innerHTML = "";
+        
+        // Pul ishlash vaqti (5 soniya kutish)
+        await new Promise(r => setTimeout(r, 5000));
+
+        try {
+            let response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+            let data = await response.json();
+
+            document.getElementById("loader").style.display = "none";
+            let html = "";
+
+            if (data.length === 0) {
+                html = "<p style='color:red; text-align:center;'>❌ Hujjat topilmadi. Modelni aniqroq yozing.</p>";
+            } else {
+                data.forEach(item => {
+                    html += `
+                    <div class="item">
+                        <a href="${item.link}" target="_blank">📄 ${item.title}</a>
+                        <div class="desc">${item.snippet || "Original PDF qo'llanma"}</div>
+                        <span class="tag">📚 ${item.type}</span>
+                    </div>`;
+                });
+            }
+            document.getElementById("resultsArea").innerHTML = html;
+
+        } catch (e) {
+            alert("Qidiruvda xatolik! Internetni tekshiring.");
+            document.getElementById("loader").style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>
