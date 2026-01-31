@@ -3,177 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Search System v3.0</title>
+    <title>Global Manual Hunter</title>
     <style>
-        /* ASOSIY STIL */
+        /* HACKER DESIGN */
         body {
-            background-color: #0d0d0d;
+            background-color: #050505;
             color: #00ff00;
-            font-family: 'Consolas', monospace;
+            font-family: 'Consolas', 'Courier New', monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
         }
 
-        /* BATAREYA VA LOGLAR STILI (O'sha-o'sha) */
-        h2 { text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px #00ff00; text-align: center; }
+        h2 { text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px #00ff00; }
+
+        /* KIRITISH MAYDONI (INPUT) */
+        input {
+            background: #111;
+            border: 1px solid #00ff00;
+            color: #fff;
+            padding: 10px;
+            width: 280px;
+            font-family: inherit;
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+
+        /* TUGMA */
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 30px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+        }
+        button:hover { background: #fff; box-shadow: 0 0 15px #fff; }
+
+        /* BATAREYA VA LOGLAR (Yashirin turadi) */
+        #processArea { display: none; width: 100%; max-width: 320px; text-align: center; }
         
         .battery-container {
-            width: 300px;
-            height: 50px;
+            width: 100%;
+            height: 40px;
             border: 2px solid #333;
-            border-radius: 5px;
-            padding: 3px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+            padding: 2px;
+            margin: 20px 0;
         }
-
         .charge {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #00cc00, #00ff00);
-            box-shadow: 0 0 20px #00ff00;
+            background: #00ff00;
+            box-shadow: 0 0 15px #00ff00;
             transition-timing-function: linear;
         }
 
         .log-window {
-            width: 320px;
-            height: 120px;
-            background-color: #111;
-            border: 1px solid #00ff00;
-            padding: 10px;
-            font-size: 0.75rem;
-            overflow: hidden;
+            height: 100px;
+            background: #000;
+            border: 1px solid #333;
+            color: #00ff00;
+            font-size: 12px;
             text-align: left;
-            opacity: 0.9;
+            padding: 5px;
+            overflow: hidden;
+            opacity: 0.7;
         }
-
-        .log-entry { margin-bottom: 4px; border-bottom: 1px solid #222; }
         .china { color: #00ffff; }
-        .success { color: #00ff00; font-weight: bold; }
-        .error { color: #ff3333; }
+        .success { color: #fff; font-weight: bold; background: #006400; }
 
-        /* YANGI: YUKLASH TUGMASI (Boshida ko'rinmaydi) */
-        #downloadBtn {
-            display: none; /* Yashirin */
-            margin-top: 30px;
-            padding: 15px 40px;
-            background-color: #00ff00;
-            color: #000;
-            font-weight: bold;
-            font-size: 18px;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 0 20px #00ff00;
-            text-transform: uppercase;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
     </style>
 </head>
 <body>
 
-    <h2 id="mainTitle">SYSTEM SEARCHING...</h2>
-
-    <div class="battery-container" id="batteryBox">
-        <div class="charge" id="batteryCharge"></div>
-    </div>
-    <div id="percentText" style="margin-bottom: 20px; font-size: 1.2rem;">0%</div>
-
-    <div class="log-window" id="logWindow">
-        <div class="log-entry">> Initializing search protocol...</div>
+    <div id="inputArea">
+        <h2>MANUAL SEARCH ENGINE</h2>
+        <p style="color: #666; font-size: 12px;">BUTUN DUNYO BO'YICHA QIDIRISH (.CN, .RU, .UZ)</p>
+        
+        <input type="text" id="modelInput" placeholder="Modelni yozing (masalan: Delta B2)">
+        <br>
+        <button onclick="startHacking()">QIDIRISH</button>
     </div>
 
-    <button id="downloadBtn" onclick="downloadFile()">📥 DOWNLOAD MANUAL</button>
+    <div id="processArea">
+        <h3 id="statusTitle">SCANNING...</h3>
+        <div class="battery-container">
+            <div class="charge" id="batteryCharge"></div>
+        </div>
+        <div class="log-window" id="logWindow"></div>
+    </div>
 
     <script>
         // ==========================================
-        // SOZLAMALAR (SHU YERNI TO'LDIRING)
+        // SOZLAMALAR
+        // ==========================================
+        const waitSeconds = 15; // Necha sekund kutsinsin? (Monetag uchun)
+        
+        // SIZNING MONETAG LINKLARINGIZ
+        const link1 = "https://otieu.com/4/10546274";
+        const link2 = "https://otieu.com/4/10546272";
+        
         // ==========================================
         
-        // 1. REKLAMA LINKLARINGIZ (Monetag)
-        const adLink1 = "https://otieu.com/4/10546274";
-        const adLink2 = "https://otieu.com/4/10546272";
-        
-        // 2. HAQIQIY FAYL LINKI (O'zingiz topib shu yerga qo'yasiz)
-        // Masalan: Telegram postingiz linki yoki Google Drive linki
-        const realFileLink = "https://t.me/SizningKanalingiz/123"; 
-
-        // ==========================================
-        
-        const waitSeconds = 12; // 12 sekund kutadi
+        const inputArea = document.getElementById('inputArea');
+        const processArea = document.getElementById('processArea');
+        const modelInput = document.getElementById('modelInput');
         const charge = document.getElementById('batteryCharge');
-        const percentText = document.getElementById('percentText');
         const logWindow = document.getElementById('logWindow');
-        const mainTitle = document.getElementById('mainTitle');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const batteryBox = document.getElementById('batteryBox');
+        const statusTitle = document.getElementById('statusTitle');
 
-        // Reklamani tanlash
-        const finalAdLink = Math.random() < 0.5 ? adLink1 : adLink2;
+        function startHacking() {
+            const model = modelInput.value;
+            if (!model) { alert("Iltimos, model nomini yozing!"); return; }
 
-        const logs = [
-            { t: 1000, msg: "Connecting to global database...", type: "normal" },
-            { t: 3000, msg: "Error: File not found in Uzbekistan.", type: "error" },
-            { t: 4500, msg: "Rerouting to Shenzen (China) Server...", type: "china" },
-            { t: 6000, msg: "Bypassing firewall security...", type: "china" },
-            { t: 8000, msg: "Scanning industrial archives...", type: "china" },
-            { t: 10000, msg: "SUCCESS: Manual found!", type: "success" },
-            { t: 11000, msg: "Preparing download link...", type: "success" }
-        ];
+            // 1. Interfeysni o'zgartirish
+            inputArea.style.display = 'none';
+            processArea.style.display = 'block';
 
-        function addLog(text, type) {
-            const div = document.createElement('div');
-            div.className = 'log-entry ' + type;
-            div.innerText = "> " + text;
-            logWindow.appendChild(div);
-            logWindow.scrollTop = logWindow.scrollHeight;
-        }
-
-        window.onload = function() {
+            // 2. Animatsiyani boshlash
             charge.style.transitionDuration = waitSeconds + 's';
             setTimeout(() => { charge.style.width = '100%'; }, 100);
 
-            let counter = 0;
-            let interval = setInterval(() => {
-                counter++;
-                percentText.innerText = counter + '%';
-                if (counter >= 100) clearInterval(interval);
-            }, (waitSeconds * 1000) / 100);
+            // 3. Loglarni chiqarish (Realistik ko'rinish uchun)
+            const logs = [
+                { t: 500, msg: `Initiating search for: ${model}` },
+                { t: 1500, msg: "Checking local cached servers..." },
+                { t: 3000, msg: "Error: No result in local DB." },
+                { t: 4000, msg: "Connecting to China Backbone (CN-IX)...", color: "cyan" },
+                { t: 6000, msg: "Bypassing Great Firewall...", color: "cyan" },
+                { t: 8000, msg: "Scanning Baidu & AliExpress Tech Specs...", color: "cyan" },
+                { t: 10000, msg: "Searching Global FTP Servers...", color: "yellow" },
+                { t: 12000, msg: "Collecting PDF metadata...", color: "yellow" },
+                { t: 14000, msg: "SUCCESS! GENERATING DIRECT LINKS...", color: "white" }
+            ];
 
             logs.forEach(item => {
-                setTimeout(() => { addLog(item.msg, item.type); }, item.t);
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.innerText = "> " + item.msg;
+                    if (item.color) div.style.color = item.color;
+                    logWindow.appendChild(div);
+                    logWindow.scrollTop = logWindow.scrollHeight;
+                }, item.t);
             });
 
-            // Vaqt tugagach:
+            // 4. VAQT TUGAGACH -> HAQIQIY QIDIRUVGA OTISH
             setTimeout(() => {
-                mainTitle.innerText = "FAYL TAYYOR!";
-                mainTitle.style.color = "#00ff00";
-                batteryBox.style.display = "none"; // Batareyani yo'qotamiz
-                percentText.style.display = "none";
-                logWindow.style.display = "none";
-                
-                // TUGMANI CHIQARAMIZ
-                downloadBtn.style.display = "block";
+                performRealSearch(model);
             }, waitSeconds * 1000);
-        };
+        }
 
-        // TUGMA BOSILGANDA NIMA BO'LADI?
-        function downloadFile() {
-            // 1. Yangi oynada REKLAMA ochiladi
-            window.open(finalAdLink, '_blank');
+        function performRealSearch(query) {
+            // MONETAG UCHUN (Yangi oynada ochiladi - pul tushishi uchun)
+            const adLink = Math.random() < 0.5 ? link1 : link2;
+            window.open(adLink, '_blank');
+
+            // HAQIQIY SUPER-QIDIRUV (Google Dorking)
+            // Bu so'rov butun dunyo bo'yicha faqat PDF larni qidiradi
+            // site:.cn (Xitoy), site:.ru (Rossiya) va filetype:pdf (Faqat hujjat)
             
-            // 2. Hozirgi oynada HAQIQIY FAYL ochiladi
-            window.location.href = realFileLink;
+            const dorkQuery = `filetype:pdf "${query}" (manual OR datasheet OR user guide OR specifications) (site:.cn OR site:.ru OR site:.com OR site:.tw)`;
+            
+            // Google ga yo'naltirish
+            window.location.href = "https://www.google.com/search?q=" + encodeURIComponent(dorkQuery);
         }
     </script>
 </body>
