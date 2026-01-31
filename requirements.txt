@@ -1,0 +1,4 @@
+aiogram
+duckduckgo-search
+aiohttp
+jinja2
