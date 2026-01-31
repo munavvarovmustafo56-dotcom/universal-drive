@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Manual Hunter</title>
+    <title>PRO Manual Search - No Ads</title>
     <style>
-        /* HACKER DESIGN */
         body {
-            background-color: #050505;
-            color: #00ff00;
-            font-family: 'Consolas', 'Courier New', monospace;
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -18,163 +17,145 @@
             margin: 0;
         }
 
-        h2 { text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px #00ff00; }
-
-        /* KIRITISH MAYDONI (INPUT) */
-        input {
-            background: #111;
-            border: 1px solid #00ff00;
-            color: #fff;
-            padding: 10px;
-            width: 280px;
-            font-family: inherit;
-            font-size: 16px;
-            margin-bottom: 20px;
-            outline: none;
-            text-align: center;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        h2 {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #03dac6;
+            margin-bottom: 30px;
         }
 
-        /* TUGMA */
+        .search-box {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            color: white;
+            font-size: 18px;
+            border-radius: 5px;
+            box-sizing: border-box; /* Inputni ramkadan chiqib ketmasligi uchun */
+            text-align: center;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #03dac6;
+        }
+
+        /* TUGMALAR DIZAYNI */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         button {
-            background: #00ff00;
-            color: #000;
+            padding: 15px;
             border: none;
-            padding: 10px 30px;
+            border-radius: 5px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            font-family: inherit;
+            transition: 0.2s;
             text-transform: uppercase;
         }
-        button:hover { background: #fff; box-shadow: 0 0 15px #fff; }
 
-        /* BATAREYA VA LOGLAR (Yashirin turadi) */
-        #processArea { display: none; width: 100%; max-width: 320px; text-align: center; }
-        
-        .battery-container {
-            width: 100%;
-            height: 40px;
-            border: 2px solid #333;
-            padding: 2px;
-            margin: 20px 0;
+        /* 1. O'zbekiston Serveri Tugmasi */
+        .btn-uz {
+            background-color: #3f51b5;
+            color: white;
         }
-        .charge {
-            height: 100%;
-            width: 0%;
-            background: #00ff00;
-            box-shadow: 0 0 15px #00ff00;
-            transition-timing-function: linear;
-        }
+        .btn-uz:hover { background-color: #5c6bc0; }
 
-        .log-window {
-            height: 100px;
-            background: #000;
-            border: 1px solid #333;
-            color: #00ff00;
-            font-size: 12px;
-            text-align: left;
-            padding: 5px;
-            overflow: hidden;
-            opacity: 0.7;
+        /* 2. Xitoy Serveri Tugmasi */
+        .btn-cn {
+            background-color: #d32f2f; /* Xitoy qizili */
+            color: white;
         }
-        .china { color: #00ffff; }
-        .success { color: #fff; font-weight: bold; background: #006400; }
+        .btn-cn:hover { background-color: #e57373; }
+
+        /* 3. Global Super Qidiruv Tugmasi */
+        .btn-global {
+            background-color: #00c853; /* Yashil */
+            color: white;
+            padding: 20px; /* Kattaroq */
+            font-size: 18px;
+            margin-top: 10px;
+            box-shadow: 0 0 10px rgba(0, 200, 83, 0.4);
+        }
+        .btn-global:hover { background-color: #69f0ae; color: #000; }
 
     </style>
 </head>
 <body>
 
-    <div id="inputArea">
-        <h2>MANUAL SEARCH ENGINE</h2>
-        <p style="color: #666; font-size: 12px;">BUTUN DUNYO BO'YICHA QIDIRISH (.CN, .RU, .UZ)</p>
+    <div class="search-box">
+        <h2>Professional Manual Qidiruv</h2>
+        <input type="text" id="modelName" placeholder="Modelni yozing (Masalan: Delta ASDA-B2)">
         
-        <input type="text" id="modelInput" placeholder="Modelni yozing (masalan: Delta B2)">
-        <br>
-        <button onclick="startHacking()">QIDIRISH</button>
-    </div>
-
-    <div id="processArea">
-        <h3 id="statusTitle">SCANNING...</h3>
-        <div class="battery-container">
-            <div class="charge" id="batteryCharge"></div>
+        <div class="btn-group">
+            <button class="btn-uz" onclick="searchUZ()">1. O'zbekiston (.uz) dan qidirish</button>
+            <button class="btn-cn" onclick="searchCN()">2. Xitoy (.cn) dan qidirish</button>
+            <button class="btn-global" onclick="searchGlobal()">3. BUTUN DUNYODAN QIDIRISH (PDF)</button>
         </div>
-        <div class="log-window" id="logWindow"></div>
     </div>
 
     <script>
-        // ==========================================
-        // SOZLAMALAR
-        // ==========================================
-        const waitSeconds = 15; // Necha sekund kutsinsin? (Monetag uchun)
-        
-        // SIZNING MONETAG LINKLARINGIZ
-        const link1 = "https://otieu.com/4/10546274";
-        const link2 = "https://otieu.com/4/10546272";
-        
-        // ==========================================
-        
-        const inputArea = document.getElementById('inputArea');
-        const processArea = document.getElementById('processArea');
-        const modelInput = document.getElementById('modelInput');
-        const charge = document.getElementById('batteryCharge');
-        const logWindow = document.getElementById('logWindow');
-        const statusTitle = document.getElementById('statusTitle');
-
-        function startHacking() {
-            const model = modelInput.value;
-            if (!model) { alert("Iltimos, model nomini yozing!"); return; }
-
-            // 1. Interfeysni o'zgartirish
-            inputArea.style.display = 'none';
-            processArea.style.display = 'block';
-
-            // 2. Animatsiyani boshlash
-            charge.style.transitionDuration = waitSeconds + 's';
-            setTimeout(() => { charge.style.width = '100%'; }, 100);
-
-            // 3. Loglarni chiqarish (Realistik ko'rinish uchun)
-            const logs = [
-                { t: 500, msg: `Initiating search for: ${model}` },
-                { t: 1500, msg: "Checking local cached servers..." },
-                { t: 3000, msg: "Error: No result in local DB." },
-                { t: 4000, msg: "Connecting to China Backbone (CN-IX)...", color: "cyan" },
-                { t: 6000, msg: "Bypassing Great Firewall...", color: "cyan" },
-                { t: 8000, msg: "Scanning Baidu & AliExpress Tech Specs...", color: "cyan" },
-                { t: 10000, msg: "Searching Global FTP Servers...", color: "yellow" },
-                { t: 12000, msg: "Collecting PDF metadata...", color: "yellow" },
-                { t: 14000, msg: "SUCCESS! GENERATING DIRECT LINKS...", color: "white" }
-            ];
-
-            logs.forEach(item => {
-                setTimeout(() => {
-                    const div = document.createElement('div');
-                    div.innerText = "> " + item.msg;
-                    if (item.color) div.style.color = item.color;
-                    logWindow.appendChild(div);
-                    logWindow.scrollTop = logWindow.scrollHeight;
-                }, item.t);
-            });
-
-            // 4. VAQT TUGAGACH -> HAQIQIY QIDIRUVGA OTISH
-            setTimeout(() => {
-                performRealSearch(model);
-            }, waitSeconds * 1000);
+        function getQuery() {
+            var val = document.getElementById("modelName").value;
+            if(val.trim() === "") {
+                alert("Iltimos, avval model nomini yozing!");
+                return null;
+            }
+            return val;
         }
 
-        function performRealSearch(query) {
-            // MONETAG UCHUN (Yangi oynada ochiladi - pul tushishi uchun)
-            const adLink = Math.random() < 0.5 ? link1 : link2;
-            window.open(adLink, '_blank');
+        // 1-USUL: Faqat O'zbekiston saytlaridan qidiradi
+        function searchUZ() {
+            var q = getQuery();
+            if(!q) return;
+            // Googlega buyruq: "Model nomi" va sayt oxiri .uz bilan tugasin
+            var url = 'https://www.google.com/search?q=' + encodeURIComponent('"' + q + '" site:.uz');
+            window.open(url, '_blank');
+        }
 
-            // HAQIQIY SUPER-QIDIRUV (Google Dorking)
-            // Bu so'rov butun dunyo bo'yicha faqat PDF larni qidiradi
-            // site:.cn (Xitoy), site:.ru (Rossiya) va filetype:pdf (Faqat hujjat)
+        // 2-USUL: Faqat Xitoy saytlaridan (manual ko'p bo'lgan joy)
+        function searchCN() {
+            var q = getQuery();
+            if(!q) return;
+            // Googlega buyruq: Faqat PDF bo'lsin va Xitoy (.cn) saytlaridan bo'lsin
+            var dork = 'filetype:pdf "' + q + '" site:.cn';
+            var url = 'https://www.google.com/search?q=' + encodeURIComponent(dork);
+            window.open(url, '_blank');
+        }
+
+        // 3-USUL: ENG KUCHLISI - Butun dunyo (UZ, CN, RU, COM)
+        function searchGlobal() {
+            var q = getQuery();
+            if(!q) return;
             
-            const dorkQuery = `filetype:pdf "${query}" (manual OR datasheet OR user guide OR specifications) (site:.cn OR site:.ru OR site:.com OR site:.tw)`;
+            // BU ENG MUKAMMAL QIDIRUV KODI:
+            // 1. filetype:pdf -> Faqat hujjat qidiradi (spam saytlarni chiqarib tashlaydi)
+            // 2. (manual OR datasheet OR user guide) -> Faqat qo'llanmalarni qidiradi
+            // 3. site:.cn OR site:.ru... -> Xitoy, Rossiya, Tayvan va Global serverlarni titkilaydi
             
-            // Google ga yo'naltirish
-            window.location.href = "https://www.google.com/search?q=" + encodeURIComponent(dorkQuery);
+            var dork = 'filetype:pdf "' + q + '" (manual OR datasheet OR user guide) -site:pinterest.*';
+            
+            var url = 'https://www.google.com/search?q=' + encodeURIComponent(dork);
+            window.open(url, '_blank');
         }
     </script>
+
 </body>
 </html>
